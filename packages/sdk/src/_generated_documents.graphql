@@ -522,6 +522,57 @@ fragment Facet on Facet {
   id
 }
 
+# A feature flag for a project.
+fragment FeatureFlag on FeatureFlag {
+  __typename
+  # The description of the feature flag.
+  description
+  # The description of the feature flag.
+  lastStageUpdatedAt
+  # The integration providing the feature flag.
+  integration {
+    id
+  }
+  # The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+  #     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+  #     been updated after creation.
+  updatedAt
+  # The pending rollout stage for the feature flag.
+  pendingRolloutStage {
+    ...FeatureFlagRolloutStage
+  }
+  # The project the feature flag is associated with.
+  project {
+    id
+  }
+  # The rollout stage of the feature flag, should be defined for all feature flags in use.
+  rolloutStage {
+    ...FeatureFlagRolloutStage
+  }
+  # The status of the feature flag.
+  status
+  # The time at which the entity was archived. Null if the entity has not been archived.
+  archivedAt
+  # The time at which the entity was created.
+  createdAt
+  # The unique identifier of the entity.
+  id
+  # The unique key as defined by the feature flag provider.
+  key
+  # The user who created the feature flag.
+  creator {
+    id
+  }
+  # The user who last changed the stage of the feature flag.
+  lastStageUpdatedBy {
+    id
+  }
+  # Url to the feature flag provider's page about the feature flag.
+  externalUrl
+  # Whether the feature flag is enabled.
+  isEnabled
+}
+
 # A generic payload return from entity archive mutations.
 fragment AttachmentArchivePayload on AttachmentArchivePayload {
   __typename
@@ -1392,6 +1443,35 @@ fragment Roadmap on Roadmap {
   owner {
     id
   }
+}
+
+# A rollout stage for a feature flag.
+fragment FeatureFlagRolloutStage on FeatureFlagRolloutStage {
+  __typename
+  # The description of the rollout stage.
+  description
+  # The integration providing the feature flag.
+  integration {
+    id
+  }
+  # The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+  #     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+  #     been updated after creation.
+  updatedAt
+  # The name of the rollout stage.
+  name
+  # The order of the rollout stages within an organization.
+  sortOrder
+  # The time at which the entity was archived. Null if the entity has not been archived.
+  archivedAt
+  # The time at which the entity was created.
+  createdAt
+  # The type of the feature flag rollout stage.
+  type
+  # The unique identifier of the entity.
+  id
+  # Which feature flag provider segments this rollout stage is associated with.
+  segmentKeys
 }
 
 # A set of issues to be resolved in a specified amount of time.
@@ -2523,6 +2603,10 @@ fragment Organization on Organization {
   allowedAuthServices
   # How git branches are formatted. If null, default formatting will be used.
   gitBranchFormat
+  # IP restriction configurations.
+  ipRestrictions {
+    ...OrganizationIpRestriction
+  }
   # Number of active users in the organization.
   userCount
   # Number of issues in the organization.
@@ -3143,6 +3227,15 @@ fragment IssueLabel on IssueLabel {
   isGroup
 }
 
+# LaunchDarkly specific settings.
+fragment LaunchDarklySettings on LaunchDarklySettings {
+  __typename
+  # The environment of the LaunchDarkly integration.
+  environment
+  # The project key of the LaunchDarkly integration.
+  projectKey
+}
+
 # Mapping of Linear teams to GitHub repos.
 fragment TeamRepoMapping on TeamRepoMapping {
   __typename
@@ -3630,6 +3723,9 @@ fragment IntegrationSettings on IntegrationSettings {
   }
   jiraPersonal {
     ...JiraPersonalSettings
+  }
+  launchDarkly {
+    ...LaunchDarklySettings
   }
   notion {
     ...NotionSettings
@@ -4560,6 +4656,26 @@ fragment FavoritePayload on FavoritePayload {
   success
 }
 
+fragment FeatureFlagConnection on FeatureFlagConnection {
+  __typename
+  nodes {
+    ...FeatureFlag
+  }
+  pageInfo {
+    ...PageInfo
+  }
+}
+
+fragment FeatureFlagRolloutStageConnection on FeatureFlagRolloutStageConnection {
+  __typename
+  nodes {
+    ...FeatureFlagRolloutStage
+  }
+  pageInfo {
+    ...PageInfo
+  }
+}
+
 fragment FrontAttachmentPayload on FrontAttachmentPayload {
   __typename
   # The identifier of the last sync operation.
@@ -5178,6 +5294,18 @@ fragment OrganizationInvitePayload on OrganizationInvitePayload {
   }
   # Whether the operation was successful.
   success
+}
+
+fragment OrganizationIpRestriction on OrganizationIpRestriction {
+  __typename
+  # IP range in CIDR format.
+  range
+  # Optional restriction description.
+  description
+  # Restriction type.
+  type
+  # Whether the restriction is enabled.
+  enabled
 }
 
 fragment OrganizationMeta on OrganizationMeta {

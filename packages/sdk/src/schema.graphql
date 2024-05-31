@@ -1285,7 +1285,7 @@ type Comment implements Node {
   """
   [Internal] The comment content as a Prosemirror document.
   """
-  bodyData: String!
+  bodyData: String
   """
   The bot that created the comment.
   """
@@ -4243,6 +4243,172 @@ input FavoriteUpdateInput {
   sortOrder: Float
 }
 
+"""
+A feature flag for a project.
+"""
+type FeatureFlag implements Node {
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+  """
+  The time at which the entity was created.
+  """
+  createdAt: DateTime!
+  """
+  The user who created the feature flag.
+  """
+  creator: User
+  """
+  The description of the feature flag.
+  """
+  description: String
+  """
+  Url to the feature flag provider's page about the feature flag.
+  """
+  externalUrl: String!
+  """
+  The unique identifier of the entity.
+  """
+  id: ID!
+  """
+  The integration providing the feature flag.
+  """
+  integration: Integration!
+  """
+  Whether the feature flag is enabled.
+  """
+  isEnabled: Boolean!
+  """
+  The unique key as defined by the feature flag provider.
+  """
+  key: String!
+  """
+  The description of the feature flag.
+  """
+  lastStageUpdatedAt: DateTime
+  """
+  The user who last changed the stage of the feature flag.
+  """
+  lastStageUpdatedBy: User
+  """
+  The organization of the feature flag.
+  """
+  organization: Organization!
+  """
+  The pending rollout stage for the feature flag.
+  """
+  pendingRolloutStage: FeatureFlagRolloutStage
+  """
+  The project the feature flag is associated with.
+  """
+  project: Project
+  """
+  The rollout stage of the feature flag, should be defined for all feature flags in use.
+  """
+  rolloutStage: FeatureFlagRolloutStage!
+  """
+  The status of the feature flag.
+  """
+  status: String!
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+}
+
+type FeatureFlagConnection {
+  edges: [FeatureFlagEdge!]!
+  nodes: [FeatureFlag!]!
+  pageInfo: PageInfo!
+}
+
+type FeatureFlagEdge {
+  """
+  Used in `before` and `after` args
+  """
+  cursor: String!
+  node: FeatureFlag!
+}
+
+"""
+A rollout stage for a feature flag.
+"""
+type FeatureFlagRolloutStage implements Node {
+  """
+  The time at which the entity was archived. Null if the entity has not been archived.
+  """
+  archivedAt: DateTime
+  """
+  The time at which the entity was created.
+  """
+  createdAt: DateTime!
+  """
+  The description of the rollout stage.
+  """
+  description: String
+  """
+  The unique identifier of the entity.
+  """
+  id: ID!
+  """
+  The integration providing the feature flag.
+  """
+  integration: Integration!
+  """
+  The name of the rollout stage.
+  """
+  name: String!
+  """
+  The organization of the feature flag rollout stage.
+  """
+  organization: Organization!
+  """
+  Which feature flag provider segments this rollout stage is associated with.
+  """
+  segmentKeys: [String!]!
+  """
+  The order of the rollout stages within an organization.
+  """
+  sortOrder: Float!
+  """
+  The type of the feature flag rollout stage.
+  """
+  type: FeatureFlagRolloutStageType!
+  """
+  The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+      for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+      been updated after creation.
+  """
+  updatedAt: DateTime!
+}
+
+type FeatureFlagRolloutStageConnection {
+  edges: [FeatureFlagRolloutStageEdge!]!
+  nodes: [FeatureFlagRolloutStage!]!
+  pageInfo: PageInfo!
+}
+
+type FeatureFlagRolloutStageEdge {
+  """
+  Used in `before` and `after` args
+  """
+  cursor: String!
+  node: FeatureFlagRolloutStage!
+}
+
+"""
+The type of a feature flag rollout stage.
+"""
+enum FeatureFlagRolloutStageType {
+  dev
+  full
+  internal
+  partial
+}
+
 type FrontAttachmentPayload {
   """
   The identifier of the last sync operation.
@@ -5061,6 +5227,14 @@ input InitiativeCreateInput {
   The initiative's status.
   """
   status: InitiativeStatus
+  """
+  The estimated completion date of the initiative.
+  """
+  targetDate: TimelessDate
+  """
+  The resolution of the initiative's estimated completion date.
+  """
+  targetDateResolution: DateResolutionType
 }
 
 type InitiativeEdge {
@@ -5330,6 +5504,10 @@ input InitiativeUpdateInput {
   The estimated completion date of the initiative.
   """
   targetDate: TimelessDate
+  """
+  The resolution of the initiative's estimated completion date.
+  """
+  targetDateResolution: DateResolutionType
 }
 
 """
@@ -5450,6 +5628,7 @@ enum IntegrationService {
   intercom
   jira
   jiraPersonal
+  launchDarkly
   loom
   notion
   opsgenie
@@ -5479,6 +5658,7 @@ type IntegrationSettings {
   intercom: IntercomSettings
   jira: JiraSettings
   jiraPersonal: JiraPersonalSettings
+  launchDarkly: LaunchDarklySettings
   notion: NotionSettings
   opsgenie: OpsgenieSettings
   pagerDuty: PagerDutySettings
@@ -5502,6 +5682,7 @@ input IntegrationSettingsInput {
   intercom: IntercomSettingsInput
   jira: JiraSettingsInput
   jiraPersonal: JiraPersonalSettingsInput
+  launchDarkly: LaunchDarklySettingsInput
   notion: NotionSettingsInput
   opsgenie: OpsgenieInput
   pagerDuty: PagerDutyInput
@@ -8768,6 +8949,31 @@ input LabelSort {
   order: PaginationSortOrder
 }
 
+"""
+LaunchDarkly specific settings.
+"""
+type LaunchDarklySettings {
+  """
+  The environment of the LaunchDarkly integration.
+  """
+  environment: String!
+  """
+  The project key of the LaunchDarkly integration.
+  """
+  projectKey: String!
+}
+
+input LaunchDarklySettingsInput {
+  """
+  The environment of the LaunchDarkly integration.
+  """
+  environment: String!
+  """
+  The project key of the LaunchDarkly integration.
+  """
+  projectKey: String!
+}
+
 type LogoutResponse {
   """
   Whether the operation was successful.
@@ -9966,6 +10172,23 @@ type Mutation {
     Jira integration update input.
     """
     input: JiraUpdateInput!
+  ): IntegrationPayload!
+  """
+  [INTERNAL] Integrates the organization with LaunchDarkly.
+  """
+  integrationLaunchDarklyConnect(
+    """
+    The LaunchDarkly API key.
+    """
+    apiKey: String!
+    """
+    The LaunchDarkly environment.
+    """
+    environment: String!
+    """
+    The LaunchDarkly project key.
+    """
+    projectKey: String!
   ): IntegrationPayload!
   """
   Enables Loom integration for the organization.
@@ -12830,6 +13053,10 @@ input NullableProjectFilter {
   """
   projectMilestones: ProjectMilestoneCollectionFilter
   """
+  Comparator for the project updates.
+  """
+  projectUpdates: ProjectUpdatesCollectionFilter
+  """
   Filters that the projects roadmaps must satisfy.
   """
   roadmaps: RoadmapCollectionFilter
@@ -12895,6 +13122,36 @@ input NullableProjectMilestoneFilter {
   Comparator for the project milestone target date.
   """
   targetDate: NullableDateComparator
+  """
+  Comparator for the updated at date.
+  """
+  updatedAt: DateComparator
+}
+
+"""
+Options for filtering projects by project updates.
+"""
+input NullableProjectUpdatesFilter {
+  """
+  Compound filters, all of which need to be matched by the project updates.
+  """
+  and: [NullableProjectUpdatesFilter!]
+  """
+  Comparator for the created at date.
+  """
+  createdAt: DateComparator
+  """
+  Comparator for the identifier.
+  """
+  id: IDComparator
+  """
+  Filter based on the existence of the relation.
+  """
+  null: Boolean
+  """
+  Compound filters, one of which need to be matched by the project updates.
+  """
+  or: [NullableProjectUpdatesFilter!]
   """
   Comparator for the updated at date.
   """
@@ -13532,6 +13789,10 @@ type Organization implements Node {
     orderBy: PaginationOrderBy
   ): IntegrationConnection!
   """
+  IP restriction configurations.
+  """
+  ipRestrictions: [OrganizationIpRestriction!]
+  """
   Labels associated with the organization.
   """
   labels(
@@ -14124,6 +14385,47 @@ input OrganizationInviteUpdateInput {
   teamIds: [String!]!
 }
 
+type OrganizationIpRestriction {
+  """
+  Optional restriction description.
+  """
+  description: String
+  """
+  Whether the restriction is enabled.
+  """
+  enabled: Boolean!
+  """
+  IP range in CIDR format.
+  """
+  range: String!
+  """
+  Restriction type.
+  """
+  type: String!
+}
+
+"""
+[INTERNAL] Organization IP restriction configuration.
+"""
+input OrganizationIpRestrictionInput {
+  """
+  Optional restriction description.
+  """
+  description: String
+  """
+  Whether the restriction is enabled.
+  """
+  enabled: Boolean!
+  """
+  IP range in CIDR format.
+  """
+  range: String!
+  """
+  Restriction type.
+  """
+  type: String!
+}
+
 type OrganizationMeta {
   """
   Allowed authentication providers, empty array means all are allowed.
@@ -14193,6 +14495,10 @@ input OrganizationUpdateInput {
   Whether the Git integration linkback messages should be sent for public repositories.
   """
   gitPublicLinkbackMessagesEnabled: Boolean
+  """
+  IP restriction configurations controlling allowed access the workspace.
+  """
+  ipRestrictions: [OrganizationIpRestrictionInput!]
   """
   Linear Preview feature flags.
   """
@@ -14950,6 +15256,10 @@ input ProjectCollectionFilter {
   """
   projectMilestones: ProjectMilestoneCollectionFilter
   """
+  Comparator for the project updates.
+  """
+  projectUpdates: ProjectUpdatesCollectionFilter
+  """
   Filters that the projects roadmaps must satisfy.
   """
   roadmaps: RoadmapCollectionFilter
@@ -15170,6 +15480,10 @@ input ProjectFilter {
   Filters that the project's milestones must satisfy.
   """
   projectMilestones: ProjectMilestoneCollectionFilter
+  """
+  Comparator for the project updates.
+  """
+  projectUpdates: ProjectUpdatesCollectionFilter
   """
   Filters that the projects roadmaps must satisfy.
   """
@@ -16587,7 +16901,7 @@ type ProjectUpdateEdge {
 }
 
 """
-ProjectUpdate filtering options.
+Options for filtering project updates.
 """
 input ProjectUpdateFilter {
   """
@@ -16872,6 +17186,70 @@ type ProjectUpdateWithInteractionPayload {
   Whether the operation was successful.
   """
   success: Boolean!
+}
+
+"""
+Collection filtering options for filtering projects by project updates.
+"""
+input ProjectUpdatesCollectionFilter {
+  """
+  Compound filters, all of which need to be matched by the project update.
+  """
+  and: [ProjectUpdatesCollectionFilter!]
+  """
+  Comparator for the created at date.
+  """
+  createdAt: DateComparator
+  """
+  Filters that needs to be matched by all updates.
+  """
+  every: ProjectUpdatesFilter
+  """
+  Comparator for the identifier.
+  """
+  id: IDComparator
+  """
+  Comparator for the collection length.
+  """
+  length: NumberComparator
+  """
+  Compound filters, one of which need to be matched by the update.
+  """
+  or: [ProjectUpdatesCollectionFilter!]
+  """
+  Filters that needs to be matched by some updates.
+  """
+  some: ProjectUpdatesFilter
+  """
+  Comparator for the updated at date.
+  """
+  updatedAt: DateComparator
+}
+
+"""
+Options for filtering projects by project updates.
+"""
+input ProjectUpdatesFilter {
+  """
+  Compound filters, all of which need to be matched by the project updates.
+  """
+  and: [ProjectUpdatesFilter!]
+  """
+  Comparator for the created at date.
+  """
+  createdAt: DateComparator
+  """
+  Comparator for the identifier.
+  """
+  id: IDComparator
+  """
+  Compound filters, one of which need to be matched by the project updates.
+  """
+  or: [ProjectUpdatesFilter!]
+  """
+  Comparator for the updated at date.
+  """
+  updatedAt: DateComparator
 }
 
 """
@@ -19451,7 +19829,6 @@ enum SlaStatus {
   HighRisk
   LowRisk
   MediumRisk
-  Paused
 }
 
 """
@@ -21449,7 +21826,7 @@ type TimeSchedule implements Node {
   """
   The schedule entries.
   """
-  entries: [TimeScheduleEntry!]!
+  entries: [TimeScheduleEntry!]
   """
   The identifier of the external schedule.
   """
@@ -22911,7 +23288,6 @@ enum ViewType {
   inbox
   initiative
   initiatives
-  initiativesAll
   initiativesCompleted
   initiativesPlanned
   issueIdentifiers

@@ -799,7 +799,7 @@ export type Comment = Node & {
   /** The comment content in markdown format. */
   body: Scalars["String"];
   /** [Internal] The comment content as a Prosemirror document. */
-  bodyData: Scalars["String"];
+  bodyData?: Maybe<Scalars["String"]>;
   /** The bot that created the comment. */
   botActor?: Maybe<ActorBot>;
   /** The children of the comment. */
@@ -2565,6 +2565,116 @@ export type FavoriteUpdateInput = {
   sortOrder?: Maybe<Scalars["Float"]>;
 };
 
+/** A feature flag for a project. */
+export type FeatureFlag = Node & {
+  __typename?: "FeatureFlag";
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  archivedAt?: Maybe<Scalars["DateTime"]>;
+  /** The time at which the entity was created. */
+  createdAt: Scalars["DateTime"];
+  /** The user who created the feature flag. */
+  creator?: Maybe<User>;
+  /** The description of the feature flag. */
+  description?: Maybe<Scalars["String"]>;
+  /** Url to the feature flag provider's page about the feature flag. */
+  externalUrl: Scalars["String"];
+  /** The unique identifier of the entity. */
+  id: Scalars["ID"];
+  /** The integration providing the feature flag. */
+  integration: Integration;
+  /** Whether the feature flag is enabled. */
+  isEnabled: Scalars["Boolean"];
+  /** The unique key as defined by the feature flag provider. */
+  key: Scalars["String"];
+  /** The description of the feature flag. */
+  lastStageUpdatedAt?: Maybe<Scalars["DateTime"]>;
+  /** The user who last changed the stage of the feature flag. */
+  lastStageUpdatedBy?: Maybe<User>;
+  /** The organization of the feature flag. */
+  organization: Organization;
+  /** The pending rollout stage for the feature flag. */
+  pendingRolloutStage?: Maybe<FeatureFlagRolloutStage>;
+  /** The project the feature flag is associated with. */
+  project?: Maybe<Project>;
+  /** The rollout stage of the feature flag, should be defined for all feature flags in use. */
+  rolloutStage: FeatureFlagRolloutStage;
+  /** The status of the feature flag. */
+  status: Scalars["String"];
+  /**
+   * The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+   *     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type FeatureFlagConnection = {
+  __typename?: "FeatureFlagConnection";
+  edges: Array<FeatureFlagEdge>;
+  nodes: Array<FeatureFlag>;
+  pageInfo: PageInfo;
+};
+
+export type FeatureFlagEdge = {
+  __typename?: "FeatureFlagEdge";
+  /** Used in `before` and `after` args */
+  cursor: Scalars["String"];
+  node: FeatureFlag;
+};
+
+/** A rollout stage for a feature flag. */
+export type FeatureFlagRolloutStage = Node & {
+  __typename?: "FeatureFlagRolloutStage";
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  archivedAt?: Maybe<Scalars["DateTime"]>;
+  /** The time at which the entity was created. */
+  createdAt: Scalars["DateTime"];
+  /** The description of the rollout stage. */
+  description?: Maybe<Scalars["String"]>;
+  /** The unique identifier of the entity. */
+  id: Scalars["ID"];
+  /** The integration providing the feature flag. */
+  integration: Integration;
+  /** The name of the rollout stage. */
+  name: Scalars["String"];
+  /** The organization of the feature flag rollout stage. */
+  organization: Organization;
+  /** Which feature flag provider segments this rollout stage is associated with. */
+  segmentKeys: Array<Scalars["String"]>;
+  /** The order of the rollout stages within an organization. */
+  sortOrder: Scalars["Float"];
+  /** The type of the feature flag rollout stage. */
+  type: FeatureFlagRolloutStageType;
+  /**
+   * The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+   *     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type FeatureFlagRolloutStageConnection = {
+  __typename?: "FeatureFlagRolloutStageConnection";
+  edges: Array<FeatureFlagRolloutStageEdge>;
+  nodes: Array<FeatureFlagRolloutStage>;
+  pageInfo: PageInfo;
+};
+
+export type FeatureFlagRolloutStageEdge = {
+  __typename?: "FeatureFlagRolloutStageEdge";
+  /** Used in `before` and `after` args */
+  cursor: Scalars["String"];
+  node: FeatureFlagRolloutStage;
+};
+
+/** The type of a feature flag rollout stage. */
+export enum FeatureFlagRolloutStageType {
+  Dev = "dev",
+  Full = "full",
+  Internal = "internal",
+  Partial = "partial",
+}
+
 export type FrontAttachmentPayload = {
   __typename?: "FrontAttachmentPayload";
   /** The identifier of the last sync operation. */
@@ -3053,6 +3163,10 @@ export type InitiativeCreateInput = {
   sortOrder?: Maybe<Scalars["Float"]>;
   /** The initiative's status. */
   status?: Maybe<InitiativeStatus>;
+  /** The estimated completion date of the initiative. */
+  targetDate?: Maybe<Scalars["TimelessDate"]>;
+  /** The resolution of the initiative's estimated completion date. */
+  targetDateResolution?: Maybe<DateResolutionType>;
 };
 
 export type InitiativeEdge = {
@@ -3223,6 +3337,8 @@ export type InitiativeUpdateInput = {
   status?: Maybe<InitiativeStatus>;
   /** The estimated completion date of the initiative. */
   targetDate?: Maybe<Scalars["TimelessDate"]>;
+  /** The resolution of the initiative's estimated completion date. */
+  targetDateResolution?: Maybe<DateResolutionType>;
 };
 
 /** An integration with an external service. */
@@ -3313,6 +3429,7 @@ export enum IntegrationService {
   Intercom = "intercom",
   Jira = "jira",
   JiraPersonal = "jiraPersonal",
+  LaunchDarkly = "launchDarkly",
   Loom = "loom",
   Notion = "notion",
   Opsgenie = "opsgenie",
@@ -3341,6 +3458,7 @@ export type IntegrationSettings = {
   intercom?: Maybe<IntercomSettings>;
   jira?: Maybe<JiraSettings>;
   jiraPersonal?: Maybe<JiraPersonalSettings>;
+  launchDarkly?: Maybe<LaunchDarklySettings>;
   notion?: Maybe<NotionSettings>;
   opsgenie?: Maybe<OpsgenieSettings>;
   pagerDuty?: Maybe<PagerDutySettings>;
@@ -3364,6 +3482,7 @@ export type IntegrationSettingsInput = {
   intercom?: Maybe<IntercomSettingsInput>;
   jira?: Maybe<JiraSettingsInput>;
   jiraPersonal?: Maybe<JiraPersonalSettingsInput>;
+  launchDarkly?: Maybe<LaunchDarklySettingsInput>;
   notion?: Maybe<NotionSettingsInput>;
   opsgenie?: Maybe<OpsgenieInput>;
   pagerDuty?: Maybe<PagerDutyInput>;
@@ -5140,6 +5259,22 @@ export type LabelSort = {
   order?: Maybe<PaginationSortOrder>;
 };
 
+/** LaunchDarkly specific settings. */
+export type LaunchDarklySettings = {
+  __typename?: "LaunchDarklySettings";
+  /** The environment of the LaunchDarkly integration. */
+  environment: Scalars["String"];
+  /** The project key of the LaunchDarkly integration. */
+  projectKey: Scalars["String"];
+};
+
+export type LaunchDarklySettingsInput = {
+  /** The environment of the LaunchDarkly integration. */
+  environment: Scalars["String"];
+  /** The project key of the LaunchDarkly integration. */
+  projectKey: Scalars["String"];
+};
+
 export type LogoutResponse = {
   __typename?: "LogoutResponse";
   /** Whether the operation was successful. */
@@ -5354,6 +5489,8 @@ export type Mutation = {
   integrationJiraPersonal: IntegrationPayload;
   /** [INTERNAL] Updates a Jira Integration. */
   integrationJiraUpdate: IntegrationPayload;
+  /** [INTERNAL] Integrates the organization with LaunchDarkly. */
+  integrationLaunchDarklyConnect: IntegrationPayload;
   /**
    * Enables Loom integration for the organization.
    * @deprecated Not available.
@@ -6129,6 +6266,12 @@ export type MutationIntegrationJiraPersonalArgs = {
 
 export type MutationIntegrationJiraUpdateArgs = {
   input: JiraUpdateInput;
+};
+
+export type MutationIntegrationLaunchDarklyConnectArgs = {
+  apiKey: Scalars["String"];
+  environment: Scalars["String"];
+  projectKey: Scalars["String"];
 };
 
 export type MutationIntegrationOpsgenieConnectArgs = {
@@ -7422,6 +7565,8 @@ export type NullableProjectFilter = {
   or?: Maybe<Array<NullableProjectFilter>>;
   /** Filters that the project's milestones must satisfy. */
   projectMilestones?: Maybe<ProjectMilestoneCollectionFilter>;
+  /** Comparator for the project updates. */
+  projectUpdates?: Maybe<ProjectUpdatesCollectionFilter>;
   /** Filters that the projects roadmaps must satisfy. */
   roadmaps?: Maybe<RoadmapCollectionFilter>;
   /** [Internal] Comparator for the project's content. */
@@ -7456,6 +7601,22 @@ export type NullableProjectMilestoneFilter = {
   or?: Maybe<Array<NullableProjectMilestoneFilter>>;
   /** Comparator for the project milestone target date. */
   targetDate?: Maybe<NullableDateComparator>;
+  /** Comparator for the updated at date. */
+  updatedAt?: Maybe<DateComparator>;
+};
+
+/** Options for filtering projects by project updates. */
+export type NullableProjectUpdatesFilter = {
+  /** Compound filters, all of which need to be matched by the project updates. */
+  and?: Maybe<Array<NullableProjectUpdatesFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: Maybe<DateComparator>;
+  /** Comparator for the identifier. */
+  id?: Maybe<IdComparator>;
+  /** Filter based on the existence of the relation. */
+  null?: Maybe<Scalars["Boolean"]>;
+  /** Compound filters, one of which need to be matched by the project updates. */
+  or?: Maybe<Array<NullableProjectUpdatesFilter>>;
   /** Comparator for the updated at date. */
   updatedAt?: Maybe<DateComparator>;
 };
@@ -7809,6 +7970,8 @@ export type Organization = Node & {
   id: Scalars["ID"];
   /** Integrations associated with the organization. */
   integrations: IntegrationConnection;
+  /** IP restriction configurations. */
+  ipRestrictions?: Maybe<Array<OrganizationIpRestriction>>;
   /** Labels associated with the organization. */
   labels: IssueLabelConnection;
   /** The organization's logo URL. */
@@ -8161,6 +8324,30 @@ export type OrganizationInviteUpdateInput = {
   teamIds: Array<Scalars["String"]>;
 };
 
+export type OrganizationIpRestriction = {
+  __typename?: "OrganizationIpRestriction";
+  /** Optional restriction description. */
+  description?: Maybe<Scalars["String"]>;
+  /** Whether the restriction is enabled. */
+  enabled: Scalars["Boolean"];
+  /** IP range in CIDR format. */
+  range: Scalars["String"];
+  /** Restriction type. */
+  type: Scalars["String"];
+};
+
+/** [INTERNAL] Organization IP restriction configuration. */
+export type OrganizationIpRestrictionInput = {
+  /** Optional restriction description. */
+  description?: Maybe<Scalars["String"]>;
+  /** Whether the restriction is enabled. */
+  enabled: Scalars["Boolean"];
+  /** IP range in CIDR format. */
+  range: Scalars["String"];
+  /** Restriction type. */
+  type: Scalars["String"];
+};
+
 export type OrganizationMeta = {
   __typename?: "OrganizationMeta";
   /** Allowed authentication providers, empty array means all are allowed. */
@@ -8206,6 +8393,8 @@ export type OrganizationUpdateInput = {
   gitLinkbackMessagesEnabled?: Maybe<Scalars["Boolean"]>;
   /** Whether the Git integration linkback messages should be sent for public repositories. */
   gitPublicLinkbackMessagesEnabled?: Maybe<Scalars["Boolean"]>;
+  /** IP restriction configurations controlling allowed access the workspace. */
+  ipRestrictions?: Maybe<Array<OrganizationIpRestrictionInput>>;
   /** Linear Preview feature flags. */
   linearPreviewFlags?: Maybe<Scalars["JSONObject"]>;
   /** The logo of the organization. */
@@ -8597,6 +8786,8 @@ export type ProjectCollectionFilter = {
   or?: Maybe<Array<ProjectCollectionFilter>>;
   /** Filters that the project's milestones must satisfy. */
   projectMilestones?: Maybe<ProjectMilestoneCollectionFilter>;
+  /** Comparator for the project updates. */
+  projectUpdates?: Maybe<ProjectUpdatesCollectionFilter>;
   /** Filters that the projects roadmaps must satisfy. */
   roadmaps?: Maybe<RoadmapCollectionFilter>;
   /** [Internal] Comparator for the project's content. */
@@ -8721,6 +8912,8 @@ export type ProjectFilter = {
   or?: Maybe<Array<ProjectFilter>>;
   /** Filters that the project's milestones must satisfy. */
   projectMilestones?: Maybe<ProjectMilestoneCollectionFilter>;
+  /** Comparator for the project updates. */
+  projectUpdates?: Maybe<ProjectUpdatesCollectionFilter>;
   /** Filters that the projects roadmaps must satisfy. */
   roadmaps?: Maybe<RoadmapCollectionFilter>;
   /** [Internal] Comparator for the project's content. */
@@ -9525,7 +9718,7 @@ export type ProjectUpdateEdge = {
   node: ProjectUpdate;
 };
 
-/** ProjectUpdate filtering options. */
+/** Options for filtering project updates. */
 export type ProjectUpdateFilter = {
   /** Compound filters, all of which need to be matched by the ProjectUpdate. */
   and?: Maybe<Array<ProjectUpdateFilter>>;
@@ -9700,6 +9893,40 @@ export type ProjectUpdateWithInteractionPayload = {
   projectUpdate: ProjectUpdate;
   /** Whether the operation was successful. */
   success: Scalars["Boolean"];
+};
+
+/** Collection filtering options for filtering projects by project updates. */
+export type ProjectUpdatesCollectionFilter = {
+  /** Compound filters, all of which need to be matched by the project update. */
+  and?: Maybe<Array<ProjectUpdatesCollectionFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: Maybe<DateComparator>;
+  /** Filters that needs to be matched by all updates. */
+  every?: Maybe<ProjectUpdatesFilter>;
+  /** Comparator for the identifier. */
+  id?: Maybe<IdComparator>;
+  /** Comparator for the collection length. */
+  length?: Maybe<NumberComparator>;
+  /** Compound filters, one of which need to be matched by the update. */
+  or?: Maybe<Array<ProjectUpdatesCollectionFilter>>;
+  /** Filters that needs to be matched by some updates. */
+  some?: Maybe<ProjectUpdatesFilter>;
+  /** Comparator for the updated at date. */
+  updatedAt?: Maybe<DateComparator>;
+};
+
+/** Options for filtering projects by project updates. */
+export type ProjectUpdatesFilter = {
+  /** Compound filters, all of which need to be matched by the project updates. */
+  and?: Maybe<Array<ProjectUpdatesFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: Maybe<DateComparator>;
+  /** Comparator for the identifier. */
+  id?: Maybe<IdComparator>;
+  /** Compound filters, one of which need to be matched by the project updates. */
+  or?: Maybe<Array<ProjectUpdatesFilter>>;
+  /** Comparator for the updated at date. */
+  updatedAt?: Maybe<DateComparator>;
 };
 
 /** A user's web browser push notification subscription. */
@@ -11093,7 +11320,6 @@ export enum SlaStatus {
   HighRisk = "HighRisk",
   LowRisk = "LowRisk",
   MediumRisk = "MediumRisk",
-  Paused = "Paused",
 }
 
 /** Comparator for sla status. */
@@ -12205,7 +12431,7 @@ export type TimeSchedule = Node & {
   /** The time at which the entity was created. */
   createdAt: Scalars["DateTime"];
   /** The schedule entries. */
-  entries: Array<TimeScheduleEntry>;
+  entries?: Maybe<Array<TimeScheduleEntry>>;
   /** The identifier of the external schedule. */
   externalId?: Maybe<Scalars["String"]>;
   /** The URL to the external schedule. */
@@ -13075,7 +13301,6 @@ export enum ViewType {
   Inbox = "inbox",
   Initiative = "initiative",
   Initiatives = "initiatives",
-  InitiativesAll = "initiativesAll",
   InitiativesCompleted = "initiativesCompleted",
   InitiativesPlanned = "initiativesPlanned",
   IssueIdentifiers = "issueIdentifiers",
@@ -13773,6 +13998,27 @@ export type FacetFragment = { __typename: "Facet" } & Pick<
   "updatedAt" | "sortOrder" | "archivedAt" | "createdAt" | "id"
 >;
 
+export type FeatureFlagFragment = { __typename: "FeatureFlag" } & Pick<
+  FeatureFlag,
+  | "description"
+  | "lastStageUpdatedAt"
+  | "updatedAt"
+  | "status"
+  | "archivedAt"
+  | "createdAt"
+  | "id"
+  | "key"
+  | "externalUrl"
+  | "isEnabled"
+> & {
+    integration: { __typename?: "Integration" } & Pick<Integration, "id">;
+    pendingRolloutStage?: Maybe<{ __typename?: "FeatureFlagRolloutStage" } & FeatureFlagRolloutStageFragment>;
+    project?: Maybe<{ __typename?: "Project" } & Pick<Project, "id">>;
+    rolloutStage: { __typename?: "FeatureFlagRolloutStage" } & FeatureFlagRolloutStageFragment;
+    creator?: Maybe<{ __typename?: "User" } & Pick<User, "id">>;
+    lastStageUpdatedBy?: Maybe<{ __typename?: "User" } & Pick<User, "id">>;
+  };
+
 export type AttachmentArchivePayloadFragment = { __typename: "AttachmentArchivePayload" } & Pick<
   AttachmentArchivePayload,
   "lastSyncId" | "success"
@@ -14178,6 +14424,11 @@ export type RoadmapFragment = { __typename: "Roadmap" } & Pick<
   "url" | "description" | "updatedAt" | "name" | "color" | "slugId" | "sortOrder" | "archivedAt" | "createdAt" | "id"
 > & { creator: { __typename?: "User" } & Pick<User, "id">; owner: { __typename?: "User" } & Pick<User, "id"> };
 
+export type FeatureFlagRolloutStageFragment = { __typename: "FeatureFlagRolloutStage" } & Pick<
+  FeatureFlagRolloutStage,
+  "description" | "updatedAt" | "name" | "sortOrder" | "archivedAt" | "createdAt" | "type" | "id" | "segmentKeys"
+> & { integration: { __typename?: "Integration" } & Pick<Integration, "id"> };
+
 export type CycleFragment = { __typename: "Cycle" } & Pick<
   Cycle,
   | "completedAt"
@@ -14261,7 +14512,7 @@ export type TimeScheduleFragment = { __typename: "TimeSchedule" } & Pick<
   "externalUrl" | "externalId" | "updatedAt" | "name" | "archivedAt" | "createdAt" | "id"
 > & {
     integration?: Maybe<{ __typename?: "Integration" } & Pick<Integration, "id">>;
-    entries: Array<{ __typename?: "TimeScheduleEntry" } & TimeScheduleEntryFragment>;
+    entries?: Maybe<Array<{ __typename?: "TimeScheduleEntry" } & TimeScheduleEntryFragment>>;
   };
 
 export type GitAutomationStateFragment = { __typename: "GitAutomationState" } & Pick<
@@ -14627,6 +14878,7 @@ export type OrganizationFragment = { __typename: "Organization" } & Pick<
   | "roadmapEnabled"
   | "slaDayCount"
 > & {
+    ipRestrictions?: Maybe<Array<{ __typename?: "OrganizationIpRestriction" } & OrganizationIpRestrictionFragment>>;
     projectStatuses: Array<{ __typename?: "ProjectStatus" } & ProjectStatusFragment>;
     subscription?: Maybe<{ __typename?: "PaidSubscription" } & PaidSubscriptionFragment>;
   };
@@ -14859,6 +15111,11 @@ export type IssueLabelFragment = { __typename: "IssueLabel" } & Pick<
     team?: Maybe<{ __typename?: "Team" } & Pick<Team, "id">>;
     creator?: Maybe<{ __typename?: "User" } & Pick<User, "id">>;
   };
+
+export type LaunchDarklySettingsFragment = { __typename: "LaunchDarklySettings" } & Pick<
+  LaunchDarklySettings,
+  "environment" | "projectKey"
+>;
 
 export type TeamRepoMappingFragment = { __typename: "TeamRepoMapping" } & Pick<
   TeamRepoMapping,
@@ -15151,6 +15408,7 @@ export type IntegrationSettingsFragment = { __typename: "IntegrationSettings" } 
   intercom?: Maybe<{ __typename?: "IntercomSettings" } & IntercomSettingsFragment>;
   jira?: Maybe<{ __typename?: "JiraSettings" } & JiraSettingsFragment>;
   jiraPersonal?: Maybe<{ __typename?: "JiraPersonalSettings" } & JiraPersonalSettingsFragment>;
+  launchDarkly?: Maybe<{ __typename?: "LaunchDarklySettings" } & LaunchDarklySettingsFragment>;
   notion?: Maybe<{ __typename?: "NotionSettings" } & NotionSettingsFragment>;
   opsgenie?: Maybe<{ __typename?: "OpsgenieSettings" } & OpsgenieSettingsFragment>;
   pagerDuty?: Maybe<{ __typename?: "PagerDutySettings" } & PagerDutySettingsFragment>;
@@ -15574,6 +15832,16 @@ export type FavoritePayloadFragment = { __typename: "FavoritePayload" } & Pick<
   "lastSyncId" | "success"
 > & { favorite: { __typename?: "Favorite" } & Pick<Favorite, "id"> };
 
+export type FeatureFlagConnectionFragment = { __typename: "FeatureFlagConnection" } & {
+  nodes: Array<{ __typename?: "FeatureFlag" } & FeatureFlagFragment>;
+  pageInfo: { __typename?: "PageInfo" } & PageInfoFragment;
+};
+
+export type FeatureFlagRolloutStageConnectionFragment = { __typename: "FeatureFlagRolloutStageConnection" } & {
+  nodes: Array<{ __typename?: "FeatureFlagRolloutStage" } & FeatureFlagRolloutStageFragment>;
+  pageInfo: { __typename?: "PageInfo" } & PageInfoFragment;
+};
+
 export type FrontAttachmentPayloadFragment = { __typename: "FrontAttachmentPayload" } & Pick<
   FrontAttachmentPayload,
   "lastSyncId" | "success"
@@ -15827,6 +16095,13 @@ type Node_Facet_Fragment = { __typename: "Facet" } & Pick<Facet, "id">;
 
 type Node_Favorite_Fragment = { __typename: "Favorite" } & Pick<Favorite, "id">;
 
+type Node_FeatureFlag_Fragment = { __typename: "FeatureFlag" } & Pick<FeatureFlag, "id">;
+
+type Node_FeatureFlagRolloutStage_Fragment = { __typename: "FeatureFlagRolloutStage" } & Pick<
+  FeatureFlagRolloutStage,
+  "id"
+>;
+
 type Node_GitAutomationState_Fragment = { __typename: "GitAutomationState" } & Pick<GitAutomationState, "id">;
 
 type Node_GitAutomationTargetBranch_Fragment = { __typename: "GitAutomationTargetBranch" } & Pick<
@@ -15984,6 +16259,8 @@ export type NodeFragment =
   | Node_ExternalUser_Fragment
   | Node_Facet_Fragment
   | Node_Favorite_Fragment
+  | Node_FeatureFlag_Fragment
+  | Node_FeatureFlagRolloutStage_Fragment
   | Node_GitAutomationState_Fragment
   | Node_GitAutomationTargetBranch_Fragment
   | Node_Initiative_Fragment
@@ -16190,6 +16467,11 @@ export type OrganizationInvitePayloadFragment = { __typename: "OrganizationInvit
   OrganizationInvitePayload,
   "lastSyncId" | "success"
 > & { organizationInvite: { __typename?: "OrganizationInvite" } & Pick<OrganizationInvite, "id"> };
+
+export type OrganizationIpRestrictionFragment = { __typename: "OrganizationIpRestriction" } & Pick<
+  OrganizationIpRestriction,
+  "range" | "description" | "type" | "enabled"
+>;
 
 export type OrganizationMetaFragment = { __typename: "OrganizationMeta" } & Pick<
   OrganizationMeta,
@@ -22760,6 +23042,26 @@ export const AuthOrganizationInviteFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<AuthOrganizationInviteFragment, unknown>;
+export const OrganizationIpRestrictionFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OrganizationIpRestriction" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "OrganizationIpRestriction" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          { kind: "Field", name: { kind: "Name", value: "range" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "enabled" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OrganizationIpRestrictionFragment, unknown>;
 export const ProjectStatusFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -22835,6 +23137,14 @@ export const OrganizationFragmentDoc = {
           { kind: "Field", name: { kind: "Name", value: "__typename" } },
           { kind: "Field", name: { kind: "Name", value: "allowedAuthServices" } },
           { kind: "Field", name: { kind: "Name", value: "gitBranchFormat" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "ipRestrictions" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "OrganizationIpRestriction" } }],
+            },
+          },
           { kind: "Field", name: { kind: "Name", value: "userCount" } },
           { kind: "Field", name: { kind: "Name", value: "createdIssueCount" } },
           { kind: "Field", name: { kind: "Name", value: "previousUrlKeys" } },
@@ -23385,6 +23695,24 @@ export const JiraPersonalSettingsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<JiraPersonalSettingsFragment, unknown>;
+export const LaunchDarklySettingsFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "LaunchDarklySettings" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "LaunchDarklySettings" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          { kind: "Field", name: { kind: "Name", value: "environment" } },
+          { kind: "Field", name: { kind: "Name", value: "projectKey" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<LaunchDarklySettingsFragment, unknown>;
 export const NotionSettingsFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -23683,6 +24011,14 @@ export const IntegrationSettingsFragmentDoc = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "JiraPersonalSettings" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "launchDarkly" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "LaunchDarklySettings" } }],
             },
           },
           {
@@ -26289,6 +26625,177 @@ export const FavoritePayloadFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<FavoritePayloadFragment, unknown>;
+export const FeatureFlagRolloutStageFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "FeatureFlagRolloutStage" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "FeatureFlagRolloutStage" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "integration" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "sortOrder" } },
+          { kind: "Field", name: { kind: "Name", value: "archivedAt" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "segmentKeys" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<FeatureFlagRolloutStageFragment, unknown>;
+export const FeatureFlagFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "FeatureFlag" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "FeatureFlag" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "lastStageUpdatedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "integration" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "pendingRolloutStage" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "FeatureFlagRolloutStage" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "project" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "rolloutStage" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "FeatureFlagRolloutStage" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "archivedAt" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "key" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "creator" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "lastStageUpdatedBy" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "externalUrl" } },
+          { kind: "Field", name: { kind: "Name", value: "isEnabled" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<FeatureFlagFragment, unknown>;
+export const FeatureFlagConnectionFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "FeatureFlagConnection" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "FeatureFlagConnection" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "nodes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "FeatureFlag" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "pageInfo" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "PageInfo" } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<FeatureFlagConnectionFragment, unknown>;
+export const FeatureFlagRolloutStageConnectionFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "FeatureFlagRolloutStageConnection" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "FeatureFlagRolloutStageConnection" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "__typename" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "nodes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "FeatureFlagRolloutStage" } }],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "pageInfo" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "FragmentSpread", name: { kind: "Name", value: "PageInfo" } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<FeatureFlagRolloutStageConnectionFragment, unknown>;
 export const FrontAttachmentPayloadFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -39077,6 +39584,7 @@ export const OrganizationDocument = {
       },
     },
     ...OrganizationFragmentDoc.definitions,
+    ...OrganizationIpRestrictionFragmentDoc.definitions,
     ...ProjectStatusFragmentDoc.definitions,
     ...PaidSubscriptionFragmentDoc.definitions,
   ],

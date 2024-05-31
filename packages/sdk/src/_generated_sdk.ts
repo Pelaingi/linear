@@ -3320,6 +3320,187 @@ export class FavoritePayload extends Request {
   }
 }
 /**
+ * A feature flag for a project.
+ *
+ * @param request - function to call the graphql client
+ * @param data - L.FeatureFlagFragment response data
+ */
+export class FeatureFlag extends Request {
+  private _creator?: L.FeatureFlagFragment["creator"];
+  private _integration: L.FeatureFlagFragment["integration"];
+  private _lastStageUpdatedBy?: L.FeatureFlagFragment["lastStageUpdatedBy"];
+  private _project?: L.FeatureFlagFragment["project"];
+
+  public constructor(request: LinearRequest, data: L.FeatureFlagFragment) {
+    super(request);
+    this.archivedAt = parseDate(data.archivedAt) ?? undefined;
+    this.createdAt = parseDate(data.createdAt) ?? new Date();
+    this.description = data.description ?? undefined;
+    this.externalUrl = data.externalUrl;
+    this.id = data.id;
+    this.isEnabled = data.isEnabled;
+    this.key = data.key;
+    this.lastStageUpdatedAt = parseDate(data.lastStageUpdatedAt) ?? undefined;
+    this.status = data.status;
+    this.updatedAt = parseDate(data.updatedAt) ?? new Date();
+    this.pendingRolloutStage = data.pendingRolloutStage
+      ? new FeatureFlagRolloutStage(request, data.pendingRolloutStage)
+      : undefined;
+    this.rolloutStage = new FeatureFlagRolloutStage(request, data.rolloutStage);
+    this._creator = data.creator ?? undefined;
+    this._integration = data.integration;
+    this._lastStageUpdatedBy = data.lastStageUpdatedBy ?? undefined;
+    this._project = data.project ?? undefined;
+  }
+
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  public archivedAt?: Date;
+  /** The time at which the entity was created. */
+  public createdAt: Date;
+  /** The description of the feature flag. */
+  public description?: string;
+  /** Url to the feature flag provider's page about the feature flag. */
+  public externalUrl: string;
+  /** The unique identifier of the entity. */
+  public id: string;
+  /** Whether the feature flag is enabled. */
+  public isEnabled: boolean;
+  /** The unique key as defined by the feature flag provider. */
+  public key: string;
+  /** The description of the feature flag. */
+  public lastStageUpdatedAt?: Date;
+  /** The status of the feature flag. */
+  public status: string;
+  /**
+   * The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+   *     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  public updatedAt: Date;
+  /** The pending rollout stage for the feature flag. */
+  public pendingRolloutStage?: FeatureFlagRolloutStage;
+  /** The rollout stage of the feature flag, should be defined for all feature flags in use. */
+  public rolloutStage: FeatureFlagRolloutStage;
+  /** The user who created the feature flag. */
+  public get creator(): LinearFetch<User> | undefined {
+    return this._creator?.id ? new UserQuery(this._request).fetch(this._creator?.id) : undefined;
+  }
+  /** The integration providing the feature flag. */
+  public get integration(): LinearFetch<Integration> | undefined {
+    return new IntegrationQuery(this._request).fetch(this._integration.id);
+  }
+  /** The user who last changed the stage of the feature flag. */
+  public get lastStageUpdatedBy(): LinearFetch<User> | undefined {
+    return this._lastStageUpdatedBy?.id ? new UserQuery(this._request).fetch(this._lastStageUpdatedBy?.id) : undefined;
+  }
+  /** The organization of the feature flag. */
+  public get organization(): LinearFetch<Organization> {
+    return new OrganizationQuery(this._request).fetch();
+  }
+  /** The project the feature flag is associated with. */
+  public get project(): LinearFetch<Project> | undefined {
+    return this._project?.id ? new ProjectQuery(this._request).fetch(this._project?.id) : undefined;
+  }
+}
+/**
+ * FeatureFlagConnection model
+ *
+ * @param request - function to call the graphql client
+ * @param fetch - function to trigger a refetch of this FeatureFlagConnection model
+ * @param data - FeatureFlagConnection response data
+ */
+export class FeatureFlagConnection extends Connection<FeatureFlag> {
+  public constructor(
+    request: LinearRequest,
+    fetch: (connection?: LinearConnectionVariables) => LinearFetch<LinearConnection<FeatureFlag> | undefined>,
+    data: L.FeatureFlagConnectionFragment
+  ) {
+    super(
+      request,
+      fetch,
+      data.nodes.map(node => new FeatureFlag(request, node)),
+      new PageInfo(request, data.pageInfo)
+    );
+  }
+}
+/**
+ * A rollout stage for a feature flag.
+ *
+ * @param request - function to call the graphql client
+ * @param data - L.FeatureFlagRolloutStageFragment response data
+ */
+export class FeatureFlagRolloutStage extends Request {
+  private _integration: L.FeatureFlagRolloutStageFragment["integration"];
+
+  public constructor(request: LinearRequest, data: L.FeatureFlagRolloutStageFragment) {
+    super(request);
+    this.archivedAt = parseDate(data.archivedAt) ?? undefined;
+    this.createdAt = parseDate(data.createdAt) ?? new Date();
+    this.description = data.description ?? undefined;
+    this.id = data.id;
+    this.name = data.name;
+    this.segmentKeys = data.segmentKeys;
+    this.sortOrder = data.sortOrder;
+    this.updatedAt = parseDate(data.updatedAt) ?? new Date();
+    this.type = data.type;
+    this._integration = data.integration;
+  }
+
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  public archivedAt?: Date;
+  /** The time at which the entity was created. */
+  public createdAt: Date;
+  /** The description of the rollout stage. */
+  public description?: string;
+  /** The unique identifier of the entity. */
+  public id: string;
+  /** The name of the rollout stage. */
+  public name: string;
+  /** Which feature flag provider segments this rollout stage is associated with. */
+  public segmentKeys: string[];
+  /** The order of the rollout stages within an organization. */
+  public sortOrder: number;
+  /**
+   * The last time at which the entity was meaningfully updated, i.e. for all changes of syncable properties except those
+   *     for which updates should not produce an update to updatedAt (see skipUpdatedAtKeys). This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  public updatedAt: Date;
+  /** The type of the feature flag rollout stage. */
+  public type: L.FeatureFlagRolloutStageType;
+  /** The integration providing the feature flag. */
+  public get integration(): LinearFetch<Integration> | undefined {
+    return new IntegrationQuery(this._request).fetch(this._integration.id);
+  }
+  /** The organization of the feature flag rollout stage. */
+  public get organization(): LinearFetch<Organization> {
+    return new OrganizationQuery(this._request).fetch();
+  }
+}
+/**
+ * FeatureFlagRolloutStageConnection model
+ *
+ * @param request - function to call the graphql client
+ * @param fetch - function to trigger a refetch of this FeatureFlagRolloutStageConnection model
+ * @param data - FeatureFlagRolloutStageConnection response data
+ */
+export class FeatureFlagRolloutStageConnection extends Connection<FeatureFlagRolloutStage> {
+  public constructor(
+    request: LinearRequest,
+    fetch: (
+      connection?: LinearConnectionVariables
+    ) => LinearFetch<LinearConnection<FeatureFlagRolloutStage> | undefined>,
+    data: L.FeatureFlagRolloutStageConnectionFragment
+  ) {
+    super(
+      request,
+      fetch,
+      data.nodes.map(node => new FeatureFlagRolloutStage(request, node)),
+      new PageInfo(request, data.pageInfo)
+    );
+  }
+}
+/**
  * FrontAttachmentPayload model
  *
  * @param request - function to call the graphql client
@@ -3962,6 +4143,7 @@ export class IntegrationSettings extends Request {
     this.intercom = data.intercom ? new IntercomSettings(request, data.intercom) : undefined;
     this.jira = data.jira ? new JiraSettings(request, data.jira) : undefined;
     this.jiraPersonal = data.jiraPersonal ? new JiraPersonalSettings(request, data.jiraPersonal) : undefined;
+    this.launchDarkly = data.launchDarkly ? new LaunchDarklySettings(request, data.launchDarkly) : undefined;
     this.notion = data.notion ? new NotionSettings(request, data.notion) : undefined;
     this.opsgenie = data.opsgenie ? new OpsgenieSettings(request, data.opsgenie) : undefined;
     this.pagerDuty = data.pagerDuty ? new PagerDutySettings(request, data.pagerDuty) : undefined;
@@ -3988,6 +4170,7 @@ export class IntegrationSettings extends Request {
   public intercom?: IntercomSettings;
   public jira?: JiraSettings;
   public jiraPersonal?: JiraPersonalSettings;
+  public launchDarkly?: LaunchDarklySettings;
   public notion?: NotionSettings;
   public opsgenie?: OpsgenieSettings;
   public pagerDuty?: PagerDutySettings;
@@ -5798,6 +5981,24 @@ export class LabelNotificationSubscription extends Request {
   }
 }
 /**
+ * LaunchDarkly specific settings.
+ *
+ * @param request - function to call the graphql client
+ * @param data - L.LaunchDarklySettingsFragment response data
+ */
+export class LaunchDarklySettings extends Request {
+  public constructor(request: LinearRequest, data: L.LaunchDarklySettingsFragment) {
+    super(request);
+    this.environment = data.environment;
+    this.projectKey = data.projectKey;
+  }
+
+  /** The environment of the LaunchDarkly integration. */
+  public environment: string;
+  /** The project key of the LaunchDarkly integration. */
+  public projectKey: string;
+}
+/**
  * LogoutResponse model
  *
  * @param request - function to call the graphql client
@@ -6600,6 +6801,9 @@ export class Organization extends Request {
     this.urlKey = data.urlKey;
     this.userCount = data.userCount;
     this.subscription = data.subscription ? new PaidSubscription(request, data.subscription) : undefined;
+    this.ipRestrictions = data.ipRestrictions
+      ? data.ipRestrictions.map(node => new OrganizationIpRestriction(request, node))
+      : undefined;
     this.projectStatuses = data.projectStatuses.map(node => new ProjectStatus(request, node));
     this.projectUpdateRemindersDay = data.projectUpdateRemindersDay;
     this.projectUpdatesReminderFrequency = data.projectUpdatesReminderFrequency;
@@ -6657,6 +6861,8 @@ export class Organization extends Request {
   public urlKey: string;
   /** Number of active users in the organization. */
   public userCount: number;
+  /** IP restriction configurations. */
+  public ipRestrictions?: OrganizationIpRestriction[];
   /** The organization's project statuses. */
   public projectStatuses: ProjectStatus[];
   /** The organization's subscription to a paid plan. */
@@ -7016,6 +7222,30 @@ export class OrganizationInvitePayload extends Request {
   public get organizationInvite(): LinearFetch<OrganizationInvite> | undefined {
     return new OrganizationInviteQuery(this._request).fetch(this._organizationInvite.id);
   }
+}
+/**
+ * OrganizationIpRestriction model
+ *
+ * @param request - function to call the graphql client
+ * @param data - L.OrganizationIpRestrictionFragment response data
+ */
+export class OrganizationIpRestriction extends Request {
+  public constructor(request: LinearRequest, data: L.OrganizationIpRestrictionFragment) {
+    super(request);
+    this.description = data.description ?? undefined;
+    this.enabled = data.enabled;
+    this.range = data.range;
+    this.type = data.type;
+  }
+
+  /** Optional restriction description. */
+  public description?: string;
+  /** Whether the restriction is enabled. */
+  public enabled: boolean;
+  /** IP range in CIDR format. */
+  public range: string;
+  /** Restriction type. */
+  public type: string;
 }
 /**
  * OrganizationMeta model
@@ -10267,7 +10497,7 @@ export class TimeSchedule extends Request {
     this.id = data.id;
     this.name = data.name;
     this.updatedAt = parseDate(data.updatedAt) ?? new Date();
-    this.entries = data.entries.map(node => new TimeScheduleEntry(request, node));
+    this.entries = data.entries ? data.entries.map(node => new TimeScheduleEntry(request, node)) : undefined;
     this._integration = data.integration ?? undefined;
   }
 
@@ -10290,7 +10520,7 @@ export class TimeSchedule extends Request {
    */
   public updatedAt: Date;
   /** The schedule entries. */
-  public entries: TimeScheduleEntry[];
+  public entries?: TimeScheduleEntry[];
   /** The identifier of the Linear integration populating the schedule. */
   public get integration(): LinearFetch<Integration> | undefined {
     return this._integration?.id ? new IntegrationQuery(this._request).fetch(this._integration?.id) : undefined;
